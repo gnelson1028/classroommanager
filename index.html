@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom Manager</title>
-    <!-- Netlify Identity Widget -->
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -13,7 +12,7 @@
             --secondary: #F5A623;
             --success: #7ED321;
             --danger: #E05454;
-            --gemini: #8E44AD; /* Purple for AI features */
+            --gemini: #8E44AD;
             --gemini-gradient: linear-gradient(135deg, #8E44AD, #3498DB);
             --background: #F4F7F6;
             --surface: #FFFFFF;
@@ -31,50 +30,6 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-        }
-
-        /* --- Login Screen Styles --- */
-        #login-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--primary);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            color: white;
-            transition: opacity 0.5s ease;
-        }
-
-        .login-card {
-            background: white;
-            padding: 40px;
-            border-radius: var(--radius);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            text-align: center;
-            color: var(--text);
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .login-card i {
-            font-size: 4rem;
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
-
-        .login-card h2 { margin-top: 0; }
-        .login-card p { color: #666; margin-bottom: 30px; }
-
-        /* Hide App Initially */
-        #app-container {
-            display: none; /* Hidden until logged in */
-            flex: 1;
-            flex-direction: column;
         }
 
         /* Header & Nav */
@@ -99,23 +54,6 @@
         }
 
         h1 { margin: 0; font-size: 1.5rem; flex: 1; text-align: center; }
-
-        .user-controls {
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-avatar {
-            width: 30px;
-            height: 30px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
 
         nav {
             display: flex;
@@ -150,6 +88,12 @@
         }
 
         /* Main Content Area */
+        #app-container {
+            display: flex; 
+            flex: 1;
+            flex-direction: column;
+        }
+
         main {
             flex: 1;
             padding: 20px;
@@ -190,7 +134,7 @@
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -199,20 +143,15 @@
         }
 
         .btn:active { transform: scale(0.95); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-primary { background: var(--primary); }
         .btn-secondary { background: var(--secondary); }
         .btn-success { background: var(--success); }
         .btn-danger { background: var(--danger); }
         
-        /* Gemini AI Button Style */
         .btn-gemini {
             background: var(--gemini-gradient);
             box-shadow: 0 2px 10px rgba(142, 68, 173, 0.3);
             border: 1px solid rgba(255,255,255,0.2);
-        }
-        .btn-gemini:hover {
-            box-shadow: 0 4px 15px rgba(142, 68, 173, 0.5);
         }
 
         input, select {
@@ -257,7 +196,6 @@
         }
         .class-item h3 { margin: 0; font-size: 1.1rem; }
         .class-item span { color: #666; font-size: 0.9rem; margin-top: 4px; display: block; }
-        .class-actions { display: flex; gap: 8px; }
 
         /* Wheel View */
         .wheel-container {
@@ -266,236 +204,81 @@
             height: 300px;
             margin: 0 auto 20px;
         }
-
-        canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
+        canvas { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .wheel-pointer {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid var(--text);
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid var(--text);
             z-index: 10;
         }
-
-        .winner-display {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary);
-            min-height: 3rem;
-            margin-top: 1rem;
-            text-align: center;
-        }
+        .winner-display { font-size: 2rem; font-weight: bold; color: var(--primary); min-height: 3rem; margin-top: 1rem; text-align: center; }
 
         /* Group View */
-        .groups-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .group-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            border-top: 5px solid var(--secondary);
-        }
-
-        .group-header {
-            background: #f8f9fa;
-            padding: 10px;
-            font-weight: bold;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-
-        .group-list {
-            list-style: none;
-            padding: 10px;
-            margin: 0;
-        }
-
-        .group-list li {
-            padding: 5px 0;
-            border-bottom: 1px dashed #eee;
-        }
+        .groups-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .group-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; border-top: 5px solid var(--secondary); }
+        .group-header { background: #f8f9fa; padding: 10px; font-weight: bold; border-bottom: 1px solid #eee; text-align: center; }
+        .group-list { list-style: none; padding: 10px; margin: 0; min-height: 40px; transition: background-color 0.2s; }
+        .group-list li { padding: 8px 5px; border-bottom: 1px dashed #eee; cursor: grab; background-color: white; border-radius: 4px; margin-bottom: 2px; }
+        .group-list li:hover { background-color: #f8f9fa; }
+        .group-list li:active { cursor: grabbing; }
+        .group-list li.dragging { opacity: 0.5; background-color: #e9ecef; }
+        .group-list.drag-over { background-color: #e3f2fd; border-radius: 4px; }
 
         /* Seating View */
-        .seating-grid {
-            display: grid;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .desk {
-            background: var(--surface);
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px 10px;
-            text-align: center;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 60px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .desk.empty {
-            background: #f0f0f0;
-            border-style: dashed;
-            color: #aaa;
-        }
+        .seating-grid { display: grid; gap: 15px; margin-top: 20px; }
+        .desk { background: var(--surface); border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px 10px; text-align: center; font-weight: 500; display: flex; align-items: center; justify-content: center; min-height: 60px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .desk.empty { background: #f0f0f0; border-style: dashed; color: #aaa; }
 
         /* Line Up View */
-        .lineup-list {
-            background: var(--surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
+        .lineup-list { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+        .lineup-item { display: flex; padding: 15px 20px; border-bottom: 1px solid #eee; align-items: center; }
+        .lineup-number { background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; }
 
-        .lineup-item {
-            display: flex;
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            align-items: center;
-        }
-
-        .lineup-number {
-            background: var(--primary);
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 15px;
-        }
-
-        .lineup-name {
-            font-size: 1.1rem;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            color: #888;
-            padding: 40px;
-        }
+        /* Utilities */
+        .empty-state { text-align: center; color: #888; padding: 40px; }
+        .empty-state i { font-size: 3rem; margin-bottom: 15px; color: #ddd; }
         
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            color: #ddd;
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 30px; border-radius: var(--radius); max-width: 500px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; max-height: 80vh; overflow-y: auto; }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; }
+        .ai-response-area { background: #F8F9FA; padding: 15px; border-radius: 8px; border-left: 4px solid #8E44AD; margin-top: 15px; white-space: pre-wrap; line-height: 1.5; }
+
+        /* Winner Animation & Removal UI */
+        .winner-text-container { display: inline-flex; align-items: center; gap: 10px; position: relative; height: 50px; }
+        .winner-text { font-size: 2.2rem; font-weight: bold; color: var(--primary); animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
+        .remove-winner-btn { opacity: 0; cursor: pointer; color: var(--danger); font-size: 1.2rem; background: none; border: none; padding: 5px; transition: all 0.2s ease; transform: scale(0.8); outline: none; }
+        .winner-text-container:hover .remove-winner-btn { opacity: 1; transform: scale(1); }
+        .remove-winner-btn:hover { color: #c0392b; transform: scale(1.2) !important; }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.3) translateY(20px); opacity: 0; }
+            60% { transform: scale(1.1) translateY(-5px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
         }
 
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(2px);
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: var(--radius);
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            position: relative;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #666;
-        }
-
-        .ai-response-area {
-            background: #F8F9FA;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #8E44AD;
-            margin-top: 15px;
-            white-space: pre-wrap;
-            line-height: 1.5;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            display: inline-block;
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 5px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (min-width: 600px) {
-            .wheel-container {
-                width: 400px;
-                height: 400px;
-            }
-            h1 { font-size: 2rem; }
-        }
+        @media (min-width: 600px) { .wheel-container { width: 400px; height: 400px; } h1 { font-size: 2rem; } }
     </style>
 </head>
 <body>
 
 <!-- LOGIN OVERLAY -->
-<div id="login-screen">
-    <div class="login-card">
-        <i class="fas fa-school"></i>
-        <h2>Classroom Manager</h2>
-        <p>Please log in to access your classroom tools.</p>
-        <div data-netlify-identity-button></div>
+<div id="login-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); flex-direction: column; align-items: center; justify-content: center; z-index: 2000; color: white;">
+    <div class="login-card" style="background: white; padding: 40px; border-radius: var(--radius); box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align: center; color: var(--text); max-width: 400px; width: 90%;">
+        <i class="fas fa-school" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px;"></i>
+        <h2 style="margin-top: 0;">Classroom Manager</h2>
+        <button class="btn btn-primary" style="width: 100%; font-size: 1.2rem; padding: 15px; border-radius: 30px;" onclick="openNetlifyModal()">
+            <i class="fas fa-sign-in-alt"></i> Log In / Sign Up
+        </button>
     </div>
 </div>
 
-<!-- MAIN APP (Hidden until login) -->
 <div id="app-container">
     <header>
         <div class="header-content">
             <h1><i class="fas fa-graduation-cap"></i> Classroom Manager</h1>
             <div class="user-controls">
                 <span id="user-greeting">Welcome!</span>
-                <div data-netlify-identity-button></div>
+                <button class="btn" style="background: rgba(255,255,255,0.2); color:white; padding: 8px 15px;" onclick="netlifyIdentity.logout()">Logout</button>
             </div>
         </div>
     </header>
@@ -510,32 +293,33 @@
     </nav>
 
     <main>
-
         <!-- ROSTER TAB -->
         <div id="roster" class="view-section active">
             <div class="controls">
                 <h2>Current Roster</h2>
-                <p>Paste names manually, or paste a messy email/paragraph and use <b>Smart Format</b> to clean it up.</p>
-                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                     <button class="btn btn-gemini" onclick="smartCleanRoster()"><i class="fas fa-magic"></i> ✨ Smart Format</button>
-                     <button class="btn btn-danger" onclick="clearRoster()"><i class="fas fa-trash"></i> Clear</button>
+                <p>Paste or type your student names here. When you are done, click <b>Apply List</b> to start using them!</p>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px;">
+                     <button id="applyBtn" class="btn btn-primary" onclick="applyRoster()"><i class="fas fa-check"></i> Apply List</button>
+                     <button id="smartFormatBtn" class="btn btn-gemini" onclick="smartCleanRoster()"><i class="fas fa-magic"></i> ✨ Smart Format</button>
+                     <button class="btn btn-danger" onclick="clearRoster()"><i class="fas fa-trash"></i> Clear Box</button>
                 </div>
             </div>
-            <textarea id="rosterInput" placeholder="Harry Potter&#10;Hermione Granger&#10;Ron Weasley&#10;Draco Malfoy..." oninput="saveRoster()"></textarea>
-            <div class="student-count" id="studentCount">0 Students</div>
+            <textarea id="rosterInput" placeholder="Harry Potter&#10;Hermione Granger&#10;Ron Weasley..."></textarea>
+            <div class="student-count" id="studentCount">0 Students Applied</div>
         </div>
 
         <!-- SAVED CLASSES TAB -->
         <div id="saved-classes" class="view-section">
             <div class="controls">
                 <h2>Manage Classes</h2>
-                <p>Save multiple rosters or backup your data to a file.</p>
+                <p>Save multiple rosters or backup your data to a file to use on another computer.</p>
                 
                 <div style="background: #eef2f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h4 style="margin-top:0;">Save Current List</h4>
+                    <h4 style="margin-top:0;">Save Your Roster</h4>
+                    <p style="font-size: 0.9em; color: #666; margin-top: -10px; margin-bottom: 10px;">This saves whatever is typed into the box on the Roster tab.</p>
                     <div style="display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap;">
                         <input type="text" id="newClassName" placeholder="e.g., Period 1 Math" style="width: 200px;">
-                        <button class="btn btn-success" onclick="saveCurrentClass()"><i class="fas fa-save"></i> Save</button>
+                        <button class="btn btn-success" onclick="saveCurrentClass()"><i class="fas fa-save"></i> Save Locally</button>
                     </div>
                 </div>
 
@@ -543,18 +327,15 @@
                 <div style="border-top: 1px dashed #ccc; padding-top: 15px; margin-top: 15px;">
                     <h4 style="margin-top:0;">Backup & Restore (Move between computers)</h4>
                     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-primary" onclick="exportBackup()"><i class="fas fa-download"></i> Backup to File</button>
+                        <button class="btn btn-primary" onclick="exportBackup()"><i class="fas fa-download"></i> Download Backup File</button>
                         <label class="btn btn-secondary" style="cursor: pointer; margin: 5px;">
                             <i class="fas fa-upload"></i> Restore from File
                             <input type="file" onchange="importBackup(this)" style="display: none;" accept=".json">
                         </label>
                     </div>
                 </div>
-
             </div>
-            <div id="savedListsContainer">
-                <!-- Saved classes injected here -->
-            </div>
+            <div id="savedListsContainer"></div>
         </div>
 
         <!-- WHEEL TAB -->
@@ -562,35 +343,31 @@
             <div class="controls">
                 <div class="wheel-container">
                     <div class="wheel-pointer"></div>
-                    <canvas id="wheelCanvas" width="400" height="400"></canvas>
+                    <canvas id="wheelCanvas" width="400" height="400" onclick="spinWheel()" style="cursor: pointer;" title="Click to Spin!"></canvas>
                 </div>
-                <div class="winner-display" id="winnerDisplay">Hit Spin!</div>
-                
-                <div id="winnerActions" style="display:none; margin-top: 15px;">
-                    <button class="btn btn-gemini" onclick="generateWheelChallenge()"><i class="fas fa-question-circle"></i> ✨ Give Challenge</button>
+                <div id="winnerDisplayContainer" style="min-height: 4rem; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                    <div class="winner-display" id="winnerDisplay" style="font-weight: normal; color: #666; font-size: 1.2rem;">Click the wheel to spin!</div>
                 </div>
-
                 <br>
-                <button class="btn btn-primary" style="font-size: 1.2rem; padding: 15px 40px;" onclick="spinWheel()">
-                    <i class="fas fa-sync-alt"></i> SPIN
+                <button class="btn btn-secondary" style="font-size: 1.1rem; padding: 10px 25px;" onclick="resetWheel()">
+                    <i class="fas fa-undo"></i> Reset Wheel List
                 </button>
                 <br><br>
-                <label style="cursor: pointer;">
-                    <input type="checkbox" id="soundToggle" checked> Enable Sound Effect
-                </label>
+                <label style="cursor: pointer;"><input type="checkbox" id="soundToggle" checked> Enable Sound</label>
             </div>
         </div>
 
         <!-- GROUPS TAB -->
         <div id="groups" class="view-section">
             <div class="controls">
+                <p style="margin-top: 0; font-size: 0.95rem; color: #666;"><i class="fas fa-hand-paper"></i> <b>Hint:</b> You can drag and drop names to reorganize groups manually!</p>
                 <select id="groupMode">
-                    <option value="count">Number of Groups</option>
-                    <option value="size">Students per Group</option>
+                    <option value="count">Divide into X Groups</option>
+                    <option value="size">Groups of X Students</option>
                 </select>
                 <input type="number" id="groupNumber" value="4" min="1" max="50" style="width: 60px;">
                 <button class="btn btn-secondary" onclick="generateGroups()"><i class="fas fa-random"></i> Generate Groups</button>
-                <button id="activityBtn" class="btn btn-gemini" style="display:none;" onclick="suggestGroupActivity()"><i class="fas fa-lightbulb"></i> ✨ Suggest Activity</button>
+                <p id="groupStatusText" style="margin-top: 10px; font-size: 0.95rem; color: #666; display: none;"></p>
             </div>
             <div id="groupsContainer" class="groups-grid"></div>
         </div>
@@ -598,8 +375,7 @@
         <!-- SEATING TAB -->
         <div id="seating" class="view-section">
             <div class="controls">
-                <label>Columns:</label>
-                <input type="number" id="colCount" value="4" min="1" max="10" style="width: 60px;">
+                <label>Columns:</label><input type="number" id="colCount" value="4" min="1" max="10" style="width: 60px;">
                 <button class="btn btn-success" onclick="generateSeating()"><i class="fas fa-chair"></i> Shuffle Seats</button>
             </div>
             <div id="seatingContainer" class="seating-grid"></div>
@@ -612,7 +388,6 @@
             </div>
             <div id="lineupContainer" class="lineup-list"></div>
         </div>
-
     </main>
 </div>
 
@@ -621,249 +396,150 @@
     <div class="modal-content">
         <button class="modal-close" onclick="closeModal()">&times;</button>
         <h2 id="modalTitle">AI Result</h2>
-        <div id="modalBody" class="ai-response-area">
-            <!-- Content goes here -->
-        </div>
-        <div style="text-align: right; margin-top: 15px;">
-            <button class="btn btn-primary" onclick="closeModal()">Close</button>
+        <div id="modalBody" class="ai-response-area"></div>
+        <div style="text-align: right; margin-top: 15px;"><button class="btn btn-primary" onclick="closeModal()">Close</button></div>
+    </div>
+</div>
+
+<!-- CUSTOM DIALOG MODAL (Replaces Alerts/Confirms) -->
+<div class="modal-overlay" id="dialogModal" style="z-index: 3000;">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <h2 id="dialogTitle" style="margin-top:0; color: var(--primary);">Notice</h2>
+        <p id="dialogMessage" style="font-size: 1.1rem; color: #444; margin-bottom: 20px;"></p>
+        <div id="dialogButtons" style="display: flex; justify-content: center; gap: 15px;">
         </div>
     </div>
 </div>
 
 <script>
-    // --- GEMINI API CONFIG ---
-    const apiKey = ""; // Injected by environment
+    // --- DIALOG SYSTEM ---
+    function customAlert(message, title = "Notice") {
+        document.getElementById('dialogTitle').innerText = title;
+        document.getElementById('dialogMessage').innerText = message;
+        const btnContainer = document.getElementById('dialogButtons');
+        btnContainer.innerHTML = `<button class="btn btn-primary" onclick="closeDialog()">OK</button>`;
+        document.getElementById('dialogModal').style.display = 'flex';
+    }
 
-    // --- AUTHENTICATION LOGIC (NETLIFY IDENTITY) ---
+    function customConfirm(message, onConfirm, title = "Confirm") {
+        document.getElementById('dialogTitle').innerText = title;
+        document.getElementById('dialogMessage').innerText = message;
+        const btnContainer = document.getElementById('dialogButtons');
+        btnContainer.innerHTML = '';
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'btn btn-secondary';
+        cancelBtn.innerText = 'Cancel';
+        cancelBtn.onclick = closeDialog;
+        
+        const confirmBtn = document.createElement('button');
+        confirmBtn.className = 'btn btn-primary';
+        confirmBtn.innerText = 'Yes, continue';
+        confirmBtn.onclick = () => { closeDialog(); onConfirm(); };
+        
+        btnContainer.appendChild(cancelBtn);
+        btnContainer.appendChild(confirmBtn);
+        document.getElementById('dialogModal').style.display = 'flex';
+    }
+
+    function closeDialog() {
+        document.getElementById('dialogModal').style.display = 'none';
+    }
+
+    // --- GEMINI API CONFIG ---
+    const apiKey = ""; 
+
+    // --- NETLIFY IDENTITY LOGIC ---
+    function openNetlifyModal() {
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.open();
+        } else {
+            customAlert("Login system is loading. Please ensure you are testing this on your Live Netlify URL, not locally.");
+        }
+    }
+
     function initAuth() {
         if (window.netlifyIdentity) {
             window.netlifyIdentity.on("init", user => {
-                if (!user) {
-                    showLogin();
-                } else {
-                    showApp(user);
-                }
+                if (!user) { showLogin(); } else { showApp(user); }
             });
-
             window.netlifyIdentity.on("login", user => {
-                window.netlifyIdentity.close();
-                showApp(user);
+                window.netlifyIdentity.close(); showApp(user);
             });
-
-            window.netlifyIdentity.on("logout", () => {
-                showLogin();
-            });
+            window.netlifyIdentity.on("logout", () => { showLogin(); });
         }
     }
 
     function showLogin() {
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('app-container').style.display = 'none';
+        const loginScreen = document.getElementById('login-screen');
+        const appContainer = document.getElementById('app-container');
+        if (loginScreen) loginScreen.style.display = 'flex';
+        if (appContainer) appContainer.style.display = 'none';
     }
 
     function showApp(user) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-container').style.display = 'flex';
+        const loginScreen = document.getElementById('login-screen');
+        const appContainer = document.getElementById('app-container');
+        if (loginScreen) loginScreen.style.display = 'none';
+        if (appContainer) appContainer.style.display = 'flex';
         
-        // Personalize greeting
-        const name = user.user_metadata?.full_name || user.email;
-        document.getElementById('user-greeting').innerText = `Hello, ${name}!`;
+        const name = user?.user_metadata?.full_name || user?.email || 'Teacher';
+        const userGreeting = document.getElementById('user-greeting');
+        if (userGreeting) userGreeting.innerText = `Hello, ${name}!`;
         
-        // Trigger resize event to ensure canvas and layout renders correctly
         window.dispatchEvent(new Event('resize'));
+        setTimeout(() => drawWheel(), 100);
     }
 
-    // --- GEMINI API CALLS ---
-    // Retry Logic for API Calls
-    async function callGemini(prompt) {
-        if (!apiKey) {
-            alert("API Key missing. This feature works in the preview environment.");
-            return null;
-        }
-
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-        const payload = {
-            contents: [{ parts: [{ text: prompt }] }]
-        };
-
-        const delays = [1000, 2000, 4000, 8000, 16000];
-        
-        for (let i = 0; i <= 5; i++) {
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const result = await response.json();
-                return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
-            } catch (error) {
-                if (i === 5) {
-                    console.error("Gemini API failed after retries:", error);
-                    return "Sorry, the AI service is currently unavailable. Please try again later.";
-                }
-                await new Promise(resolve => setTimeout(resolve, delays[i]));
-            }
-        }
-    }
-
-    // Helper to show loading state on button
-    async function runWithLoading(btnElement, callback) {
-        const originalText = btnElement.innerHTML;
-        btnElement.innerHTML = `<span class="spinner"></span> Thinking...`;
-        btnElement.disabled = true;
-        
-        try {
-            await callback();
-        } finally {
-            btnElement.innerHTML = originalText;
-            btnElement.disabled = false;
-        }
-    }
-
-    function showModal(title, content) {
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('modalBody').innerText = content;
-        document.getElementById('aiModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('aiModal').style.display = 'none';
-    }
-
-    // --- AI FEATURES ---
-
-    // Feature 1: Smart Roster Cleaning
-    async function smartCleanRoster() {
-        const textarea = document.getElementById('rosterInput');
-        const rawText = textarea.value.trim();
-
-        if (!rawText) {
-            alert("Please paste some text into the box first (e.g., an email, a paragraph, or a messy list).");
-            return;
-        }
-
-        await runWithLoading(event.currentTarget, async () => {
-            const prompt = `
-                I have a messy list of student names. Please extract ONLY the names.
-                - Remove numbering, bullet points, emails, or other text.
-                - Format them simply as one name per line.
-                - Do not include any introductory text like "Here is the list".
-                
-                Here is the text:
-                "${rawText}"
-            `;
-            
-            const cleanedText = await callGemini(prompt);
-            if (cleanedText) {
-                textarea.value = cleanedText.trim();
-                saveRoster(); // Saves and updates UI
-                alert("Roster cleaned and formatted!");
-            }
-        });
-    }
-
-    // Feature 2: Group Activity Suggestion
-    async function suggestGroupActivity() {
-        const numStudents = students.length;
-        // Estimate group count based on cards rendered
-        const groupCards = document.querySelectorAll('.group-card');
-        const numGroups = groupCards.length;
-        
-        if (numGroups === 0) return;
-
-        await runWithLoading(document.getElementById('activityBtn'), async () => {
-            const prompt = `
-                Suggest a quick, fun, 5-10 minute classroom team-building activity or discussion topic.
-                Context:
-                - There are ${numGroups} groups.
-                - Total class size is ${numStudents} students.
-                
-                Format the response clearly with:
-                1. Activity Title
-                2. Quick Instructions
-                3. "Why it works" (one sentence).
-                Keep it brief and encouraging.
-            `;
-            
-            const activity = await callGemini(prompt);
-            showModal("✨ Suggested Group Activity", activity);
-        });
-    }
-
-    // Feature 3: Wheel Challenge
-    async function generateWheelChallenge() {
-        const winnerText = document.getElementById('winnerDisplay').innerText;
-        // winnerText format is "Winner: Name! 🎉"
-        const winnerName = winnerText.replace("Winner: ", "").replace("!", "").replace(" 🎉", "").trim();
-
-        await runWithLoading(event.currentTarget, async () => {
-            const prompt = `
-                Generate a fun, lighthearted, school-appropriate "Pop Quiz" question OR a silly 30-second challenge for a student named ${winnerName}.
-                
-                Examples: "Spell 'awkward' backwards", "Name 5 capitals in 10 seconds", "Do your best impression of a penguin".
-                
-                Just give me the challenge text directly.
-            `;
-            
-            const challenge = await callGemini(prompt);
-            showModal(`✨ Challenge for ${winnerName}`, challenge);
-        });
-    }
-
-
-    // --- STATE MANAGEMENT ---
+    // --- DATA MANAGEMENT (LOCAL STORAGE + BACKUP) ---
     let students = [];
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9B59B6', '#3498DB'];
 
-    // Initialize on load
     window.addEventListener('DOMContentLoaded', () => {
-        // Initialize Auth
-        initAuth();
+        showApp({ user_metadata: { full_name: 'Tester' } });
+        // initAuth(); 
 
-        // Load Current Roster
         const saved = localStorage.getItem('classroomRoster');
         if (saved) {
             document.getElementById('rosterInput').value = saved;
-            updateStudentList();
+            students = saved.split('\n').map(s => s.trim()).filter(s => s !== '');
+            document.getElementById('studentCount').innerText = `${students.length} Students Applied`;
+            if(students.length > 0) setTimeout(drawWheel, 100);
         }
-        
-        // Initialize Saved Classes View
         renderSavedClasses();
-
-        // Delay wheel draw slightly to ensure container is visible/sized if logged in immediately
-        setTimeout(() => drawWheel(), 100);
     });
 
-    // --- ROSTER FUNCTIONS ---
-    function saveRoster() {
+    function applyRoster() {
         const text = document.getElementById('rosterInput').value;
         localStorage.setItem('classroomRoster', text);
-        updateStudentList();
-    }
-
-    function updateStudentList() {
-        const text = document.getElementById('rosterInput').value;
-        // Filter out empty lines
-        students = text.split('\n').map(s => s.trim()).filter(s => s !== '');
-        document.getElementById('studentCount').innerText = `${students.length} Students`;
         
-        // Redraw wheel if visible or update state for others
-        if(students.length > 0) drawWheel();
+        students = text.split('\n').map(s => s.trim()).filter(s => s !== '');
+        document.getElementById('studentCount').innerText = `${students.length} Students Applied`;
+        drawWheel();
+
+        const btn = document.getElementById('applyBtn');
+        if (btn) {
+            const origHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Applied!';
+            btn.classList.replace('btn-primary', 'btn-success');
+            
+            setTimeout(() => {
+                btn.innerHTML = origHTML;
+                btn.classList.replace('btn-success', 'btn-primary');
+            }, 2000);
+        }
     }
 
     function clearRoster() {
-        if(confirm('Are you sure you want to clear the roster?')) {
+        customConfirm('Clear the text box?', () => {
             document.getElementById('rosterInput').value = '';
-            saveRoster();
+            localStorage.setItem('classroomRoster', '');
+            students = [];
+            document.getElementById('studentCount').innerText = `0 Students Applied`;
             drawWheel();
-        }
+        });
     }
 
-    // --- SAVED CLASSES LOGIC ---
     function getSavedClasses() {
         return JSON.parse(localStorage.getItem('classroomClasses') || '{}');
     }
@@ -871,11 +547,12 @@
     function renderSavedClasses() {
         const classes = getSavedClasses();
         const container = document.getElementById('savedListsContainer');
+        if (!container) return;
         container.innerHTML = '';
         
         const names = Object.keys(classes);
         if (names.length === 0) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-folder"></i><p>No saved classes yet. <br>Go to Roster, enter names, then come here to save.</p></div>';
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-folder"></i><p>No saved classes locally.</p></div>';
             return;
         }
 
@@ -884,386 +561,434 @@
             const item = document.createElement('div');
             item.className = 'class-item';
             
-            item.innerHTML = `
-                <div>
-                    <h3>${name}</h3>
-                    <span>${count} Students</span>
-                </div>
-                <div class="class-actions">
-                    <button class="btn btn-primary" onclick="loadClass('${name}')">Load</button>
-                    <button class="btn btn-danger" onclick="deleteClass('${name}')"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
+            const infoDiv = document.createElement('div');
+            infoDiv.innerHTML = `<h3>${name}</h3><span>${count} Students</span>`;
+            
+            const actionDiv = document.createElement('div');
+            actionDiv.style.display = 'flex';
+            actionDiv.style.gap = '8px';
+
+            const loadBtn = document.createElement('button');
+            loadBtn.className = 'btn btn-primary';
+            loadBtn.innerText = 'Load';
+            loadBtn.onclick = () => loadClass(name);
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn btn-danger';
+            delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            delBtn.onclick = () => deleteClass(name);
+
+            actionDiv.appendChild(loadBtn);
+            actionDiv.appendChild(delBtn);
+
+            item.appendChild(infoDiv);
+            item.appendChild(actionDiv);
             container.appendChild(item);
         });
     }
 
     function saveCurrentClass() {
         const name = document.getElementById('newClassName').value.trim();
-        if (!name) return alert("Please enter a name for this class.");
-        if (students.length === 0) return alert("The current roster is empty! Add names in the Roster tab first.");
+        if (!name) return customAlert("Please enter a class name.");
+        
+        const currentText = document.getElementById('rosterInput').value;
+        const currentList = currentText.split('\n').map(s => s.trim()).filter(s => s !== '');
+        
+        if (currentList.length === 0) return customAlert("Your roster box is empty. Add names on the Roster tab first.");
         
         const classes = getSavedClasses();
-        if (classes[name] && !confirm(`Overwrite existing class "${name}"?`)) return;
-        
-        classes[name] = students;
+        if (classes[name]) {
+            customConfirm(`Overwrite class "${name}"?`, () => doSaveClass(name, currentList, currentText));
+        } else {
+            doSaveClass(name, currentList, currentText);
+        }
+    }
+    
+    function doSaveClass(name, currentList, currentText) {
+        const classes = getSavedClasses();
+        classes[name] = currentList; 
         localStorage.setItem('classroomClasses', JSON.stringify(classes));
+        
+        students = currentList;
+        localStorage.setItem('classroomRoster', currentText);
+        document.getElementById('studentCount').innerText = `${students.length} Students Applied`;
+        drawWheel();
+        
         document.getElementById('newClassName').value = '';
         renderSavedClasses();
-        alert(`Saved "${name}"!`);
+        customAlert(`Successfully saved "${name}" locally!`);
     }
 
     function loadClass(name) {
-        if (students.length > 0 && !confirm(`Load "${name}"? This will replace your current active roster.`)) return;
-        
+        if (students.length > 0) {
+            customConfirm(`Overwrite your current workbench with "${name}"?`, () => doLoadClass(name));
+        } else {
+            doLoadClass(name);
+        }
+    }
+    
+    function doLoadClass(name) {
         const classes = getSavedClasses();
-        const list = classes[name];
-        
-        if(list) {
-            document.getElementById('rosterInput').value = list.join('\n');
-            saveRoster(); // Updates state and localStorage current list
+        if(classes[name]) {
+            const rosterText = classes[name].join('\n');
+            const textArea = document.getElementById('rosterInput');
+            if (textArea) textArea.value = rosterText;
+            
+            localStorage.setItem('classroomRoster', rosterText);
+            students = classes[name];
+            const studentCount = document.getElementById('studentCount');
+            if (studentCount) studentCount.innerText = `${students.length} Students Applied`;
+            drawWheel();
+            
             switchTab('roster');
+
+            if (textArea) {
+                textArea.style.transition = 'none';
+                textArea.style.backgroundColor = '#d4edda';
+                setTimeout(() => {
+                    textArea.style.transition = 'background-color 0.8s ease';
+                    textArea.style.backgroundColor = 'white';
+                }, 100);
+            }
         }
     }
 
     function deleteClass(name) {
-        if (!confirm(`Delete "${name}" permanently?`)) return;
-        const classes = getSavedClasses();
-        delete classes[name];
-        localStorage.setItem('classroomClasses', JSON.stringify(classes));
-        renderSavedClasses();
+        customConfirm(`Delete "${name}" permanently?`, () => {
+            const classes = getSavedClasses();
+            delete classes[name];
+            localStorage.setItem('classroomClasses', JSON.stringify(classes));
+            renderSavedClasses();
+        });
     }
-    
+
     // --- BACKUP & RESTORE LOGIC ---
     function exportBackup() {
         const data = {
             roster: localStorage.getItem('classroomRoster') || "",
             classes: localStorage.getItem('classroomClasses') || "{}"
         };
-        
         const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = `classroom_backup_${new Date().toISOString().slice(0,10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
 
     function importBackup(input) {
         const file = input.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-                
-                // Confirm before overwriting
-                if(!confirm("Restoring will overwrite your current data. Continue?")) {
-                    input.value = ''; // Reset input
-                    return;
-                }
-
-                if (data.roster !== undefined) localStorage.setItem('classroomRoster', data.roster);
-                if (data.classes !== undefined) localStorage.setItem('classroomClasses', data.classes);
-
-                alert("Backup restored successfully!");
-                location.reload(); // Refresh to load new data
-            } catch (err) {
-                alert("Error reading backup file: " + err);
-            }
+                customConfirm("Restoring will overwrite your current local data. Continue?", () => {
+                    if (data.roster !== undefined) localStorage.setItem('classroomRoster', data.roster);
+                    if (data.classes !== undefined) localStorage.setItem('classroomClasses', data.classes);
+                    customAlert("Backup restored! The page will refresh.");
+                    setTimeout(() => location.reload(), 1500);
+                });
+            } catch (err) { customAlert("Error reading file: " + err); }
+            input.value = '';
         };
         reader.readAsText(file);
     }
 
-
-    // --- NAVIGATION ---
+    // --- UTILS & NAVIGATION ---
     function switchTab(tabId) {
-        // Update Buttons
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-
-        // Update Views
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.getAttribute('onclick').includes(tabId)) {
+                btn.classList.add('active');
+            }
+        });
+        
         document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-
-        // specific triggers
+        const tab = document.getElementById(tabId);
+        if (tab) tab.classList.add('active');
         if (tabId === 'wheel') drawWheel();
     }
 
-    // --- UTILITIES ---
     function shuffle(array) {
-        let currentIndex = array.length, randomIndex;
-        // Copy array to avoid mutating original
-        let tempArray = [...array]; 
-
-        while (currentIndex != 0) {
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            [tempArray[currentIndex], tempArray[randomIndex]] = [tempArray[randomIndex], tempArray[currentIndex]];
+        let temp = [...array]; 
+        for(let i=temp.length-1; i>0; i--) {
+            const j = Math.floor(Math.random()*(i+1));
+            [temp[i], temp[j]] = [temp[j], temp[i]];
         }
-        return tempArray;
-    }
-
-    function getEmptyState() {
-        return `<div class="empty-state">
-            <i class="fas fa-user-edit"></i>
-            <p>Add names to the Roster tab to get started!</p>
-        </div>`;
+        return temp;
     }
 
     // --- WHEEL LOGIC ---
-    let wheelCtx = document.getElementById('wheelCanvas').getContext('2d');
-    let currentRotation = 0;
-    let isSpinning = false;
-    let spinVelocity = 0;
-    let animationId = null;
-
-    // Web Audio Context for sound
+    let wheelCtx = document.getElementById('wheelCanvas')?.getContext('2d');
+    let currentRotation = 0, isSpinning = false, spinVelocity = 0, animationId = null;
     let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
     function playTick() {
-        if(!document.getElementById('soundToggle').checked) return;
+        const toggle = document.getElementById('soundToggle');
+        if(!toggle || !toggle.checked) return;
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function playWinnerSound() {
+        const toggle = document.getElementById('soundToggle');
+        if(!toggle || !toggle.checked) return;
         if(audioCtx.state === 'suspended') audioCtx.resume();
         
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        // Plays a pleasant upward chime (A4, C#5, E5, A5)
+        const frequencies = [440, 554.37, 659.25, 880];
+        let startTime = audioCtx.currentTime;
         
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
-        
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-        
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.1);
+        frequencies.forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            
+            gain.gain.setValueAtTime(0, startTime + i * 0.08);
+            gain.gain.linearRampToValueAtTime(0.2, startTime + i * 0.08 + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + i * 0.08 + 0.4);
+            
+            osc.start(startTime + i * 0.08);
+            osc.stop(startTime + i * 0.08 + 0.5);
+        });
     }
 
     function drawWheel() {
-        const canvas = document.getElementById('wheelCanvas');
+        if (!wheelCtx) return;
+        const canvas = document.getElementById('wheelCanvas'); 
         const ctx = wheelCtx;
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const radius = canvas.width / 2 - 10;
-
+        const centerX = canvas.width / 2; const centerY = canvas.height / 2; const radius = canvas.width / 2 - 10;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         if (students.length === 0) {
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-            ctx.fillStyle = '#ddd';
-            ctx.fill();
-            ctx.fillStyle = '#666';
-            ctx.font = '20px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText("Add Students", centerX, centerY);
+            ctx.beginPath(); ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI); ctx.fillStyle = '#ddd'; ctx.fill();
+            ctx.fillStyle = '#666'; ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.fillText("No Students", centerX, centerY);
             return;
         }
 
         const arcSize = (2 * Math.PI) / students.length;
-
         for (let i = 0; i < students.length; i++) {
             const angle = currentRotation + i * arcSize;
-            
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.arc(centerX, centerY, radius, angle, angle + arcSize);
-            ctx.fillStyle = colors[i % colors.length];
-            ctx.fill();
-            ctx.stroke();
-
-            // Text
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate(angle + arcSize / 2);
-            ctx.textAlign = "right";
-            ctx.fillStyle = "white";
-            ctx.font = "bold 16px Arial";
-            ctx.shadowColor = "rgba(0,0,0,0.5)";
-            ctx.shadowBlur = 2;
-            ctx.fillText(students[i], radius - 20, 5);
-            ctx.restore();
+            ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.arc(centerX, centerY, radius, angle, angle + arcSize);
+            ctx.fillStyle = colors[i % colors.length]; ctx.fill(); ctx.stroke();
+            ctx.save(); ctx.translate(centerX, centerY); ctx.rotate(angle + arcSize / 2);
+            ctx.textAlign = "right"; ctx.fillStyle = "white"; ctx.font = "bold 16px Arial";
+            ctx.fillText(students[i], radius - 20, 5); ctx.restore();
         }
     }
 
     function spinWheel() {
         if (isSpinning || students.length === 0) return;
-        
-        // Hide winner actions when spinning starts
-        document.getElementById('winnerActions').style.display = 'none';
-        
-        isSpinning = true;
-        spinVelocity = Math.random() * 0.5 + 0.5; // Random initial speed
-        document.getElementById('winnerDisplay').innerText = "Spinning...";
-        document.getElementById('winnerDisplay').style.color = "#4A90E2";
+        isSpinning = true; spinVelocity = Math.random() * 0.5 + 0.5; 
+        const display = document.getElementById('winnerDisplay');
+        if (display) {
+            display.style.fontWeight = 'bold';
+            display.style.color = '#4A90E2';
+            display.style.fontSize = '2rem';
+            display.innerText = "Spinning...";
+        }
 
         let lastIndex = -1;
-
         function animate() {
-            spinVelocity *= 0.985; // Friction
-            currentRotation += spinVelocity;
-            
-            drawWheel();
-
-            // Calculate current index for sound
-            const arcSize = (2 * Math.PI) / students.length;
-            const normalizedRotation = currentRotation % (2 * Math.PI);
+            spinVelocity *= 0.985; currentRotation += spinVelocity; drawWheel();
+            const arcSize = (2 * Math.PI) / students.length; const normalizedRotation = currentRotation % (2 * Math.PI);
             const pointerAngle = (3 * Math.PI / 2 - normalizedRotation + 2 * Math.PI) % (2 * Math.PI);
             const index = Math.floor(pointerAngle / arcSize);
-            
-            if (index !== lastIndex && spinVelocity > 0.05) {
-                playTick();
-                lastIndex = index;
-            }
+            if (index !== lastIndex && spinVelocity > 0.05) { playTick(); lastIndex = index; }
 
-            if (spinVelocity > 0.002) {
-                animationId = requestAnimationFrame(animate);
-            } else {
-                isSpinning = false;
-                spinVelocity = 0;
-                determineWinner();
+            if (spinVelocity > 0.002) { animationId = requestAnimationFrame(animate); } 
+            else {
+                isSpinning = false; spinVelocity = 0;
+                const winner = students[index];
+                if (display) {
+                    display.innerHTML = `
+                        <div class="winner-text-container">
+                            <span class="winner-text">Winner: ${winner}! 🎉</span>
+                            <button class="remove-winner-btn" onclick="removeWinnerIndex(${index})" title="Remove ${winner.replace(/"/g, '&quot;')} from wheel"><i class="fas fa-times"></i></button>
+                        </div>
+                    `;
+                }
+                playWinnerSound();
             }
         }
         animate();
     }
 
-    function determineWinner() {
-        const arcSize = (2 * Math.PI) / students.length;
-        const normalizedRotation = currentRotation % (2 * Math.PI);
-        const pointerAngle = (3 * Math.PI / 2 - normalizedRotation + 2 * Math.PI) % (2 * Math.PI);
-        const winningIndex = Math.floor(pointerAngle / arcSize);
-        
-        const winner = students[winningIndex];
+    function removeWinnerIndex(index) {
+        students.splice(index, 1);
+        drawWheel();
         const display = document.getElementById('winnerDisplay');
-        display.innerText = `Winner: ${winner}!`;
-        display.style.color = colors[winningIndex % colors.length];
-        
-        // Show the Gemini Challenge button
-        document.getElementById('winnerActions').style.display = 'block';
-
-        // Simple confetti effect (emoji burst)
-        display.innerHTML += " 🎉";
-        playTick(); // Final tick
+        if (display) {
+            display.style.fontWeight = 'normal';
+            display.style.color = '#666';
+            display.style.fontSize = '1.2rem';
+            display.innerHTML = students.length > 0 ? 'Name removed. Click the wheel to spin again!' : 'All out of names! Reset the list.';
+        }
     }
 
-    // --- GROUP MAKER LOGIC ---
-    function generateGroups() {
-        const container = document.getElementById('groupsContainer');
-        container.innerHTML = '';
-        
-        // Hide activity button initially
-        document.getElementById('activityBtn').style.display = 'none';
-        
-        if (students.length === 0) {
-            container.innerHTML = getEmptyState();
-            return;
+    function resetWheel() {
+        const currentText = document.getElementById('rosterInput')?.value || '';
+        students = currentText.split('\n').map(s => s.trim()).filter(s => s !== '');
+        drawWheel();
+        const display = document.getElementById('winnerDisplay');
+        if (display) {
+            display.style.fontWeight = 'normal';
+            display.style.color = '#666';
+            display.style.fontSize = '1.2rem';
+            display.innerHTML = 'List reset! Click the wheel to spin.';
         }
+    }
 
-        const mode = document.getElementById('groupMode').value;
-        const inputVal = parseInt(document.getElementById('groupNumber').value);
-        const shuffled = shuffle(students);
-        let groups = [];
+    // --- OTHER TOOLS ---
+    let draggedItem = null;
+
+    function generateGroups() {
+        const container = document.getElementById('groupsContainer'); 
+        if (container) container.innerHTML = '';
+        const statusText = document.getElementById('groupStatusText');
+        if (statusText) statusText.style.display = 'none';
+
+        if (students.length === 0) return;
+
+        const mode = document.getElementById('groupMode')?.value || 'count';
+        const inputVal = parseInt(document.getElementById('groupNumber')?.value || '4');
+        const shuffled = shuffle(students); let groups = [];
 
         if (mode === 'count') {
-            // Divide into X groups
             const numGroups = Math.min(inputVal, students.length);
             for(let i=0; i<numGroups; i++) groups.push([]);
-            
-            shuffled.forEach((student, index) => {
-                groups[index % numGroups].push(student);
-            });
+            shuffled.forEach((s, i) => groups[i % numGroups].push(s));
         } else {
-            // Groups of X students
             const size = Math.max(1, inputVal);
-            for (let i = 0; i < shuffled.length; i += size) {
-                groups.push(shuffled.slice(i, i + size));
-            }
+            for (let i = 0; i < shuffled.length; i += size) groups.push(shuffled.slice(i, i + size));
         }
 
-        // Render
-        groups.forEach((group, index) => {
-            const card = document.createElement('div');
-            card.className = 'group-card';
-            card.style.borderTopColor = colors[index % colors.length];
+        if (statusText) {
+            statusText.innerText = `Currently grouping ${students.length} active students. (Hint: Use "Reset Wheel List" to restore any names removed during wheel spins).`;
+            statusText.style.display = 'block';
+        }
+
+        groups.forEach((g, i) => {
+            const card = document.createElement('div'); 
+            card.className = 'group-card'; 
+            card.style.borderTopColor = colors[i % colors.length];
             
-            let listHtml = group.map(s => `<li>${s}</li>`).join('');
+            const header = document.createElement('div');
+            header.className = 'group-header';
+            header.innerText = `Group ${i + 1}`;
             
-            card.innerHTML = `
-                <div class="group-header">Group ${index + 1}</div>
-                <ul class="group-list">${listHtml}</ul>
-            `;
-            container.appendChild(card);
+            const ul = document.createElement('ul');
+            ul.className = 'group-list';
+            
+            // --- Drag and Drop Dropzone Logic ---
+            ul.addEventListener('dragover', e => {
+                e.preventDefault(); // Necessary to allow dropping
+                ul.classList.add('drag-over');
+            });
+            
+            ul.addEventListener('dragleave', () => {
+                ul.classList.remove('drag-over');
+            });
+            
+            ul.addEventListener('drop', e => {
+                e.preventDefault();
+                ul.classList.remove('drag-over');
+                if (draggedItem) {
+                    ul.appendChild(draggedItem);
+                }
+            });
+
+            g.forEach(s => {
+                const li = document.createElement('li');
+                li.innerText = s;
+                li.draggable = true;
+                
+                // --- Drag and Drop Item Logic ---
+                li.addEventListener('dragstart', function() {
+                    draggedItem = this;
+                    setTimeout(() => this.classList.add('dragging'), 0);
+                });
+                
+                li.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                    draggedItem = null;
+                });
+                
+                ul.appendChild(li);
+            });
+            
+            card.appendChild(header);
+            card.appendChild(ul);
+            if (container) container.appendChild(card);
         });
-
-        // Show "Suggest Activity" button if groups exist
-        if (groups.length > 0) {
-            document.getElementById('activityBtn').style.display = 'inline-flex';
-        }
     }
 
-    // --- SEATING CHART LOGIC ---
     function generateSeating() {
-        const container = document.getElementById('seatingContainer');
-        container.innerHTML = '';
-
-        if (students.length === 0) {
-            container.innerHTML = getEmptyState();
-            return;
-        }
-
-        const cols = document.getElementById('colCount').value;
-        container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-
-        const shuffled = shuffle(students);
-        
-        shuffled.forEach(student => {
-            const desk = document.createElement('div');
-            desk.className = 'desk';
-            desk.innerText = student;
-            container.appendChild(desk);
+        const container = document.getElementById('seatingContainer'); 
+        if (container) container.innerHTML = '';
+        if (students.length === 0) return;
+        const cols = document.getElementById('colCount')?.value || '4';
+        if (container) container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        shuffle(students).forEach(s => {
+            const d = document.createElement('div'); d.className = 'desk'; d.innerText = s; 
+            if (container) container.appendChild(d);
         });
-
-        // Fill empty spots to make grid look square if needed (optional)
-        const totalSlots = Math.ceil(students.length / cols) * cols;
-        const emptySlots = totalSlots - students.length;
-        
-        for(let i=0; i<emptySlots; i++) {
-             const desk = document.createElement('div');
-             desk.className = 'desk empty';
-             desk.innerText = "Empty";
-             container.appendChild(desk);
-        }
     }
 
-    // --- LINE UP LOGIC ---
     function generateLineup() {
-        const container = document.getElementById('lineupContainer');
-        container.innerHTML = '';
-
-        if (students.length === 0) {
-            container.innerHTML = getEmptyState();
-            return;
-        }
-
-        const shuffled = shuffle(students);
-
-        shuffled.forEach((student, index) => {
-            const item = document.createElement('div');
-            item.className = 'lineup-item';
-            item.innerHTML = `
-                <div class="lineup-number">${index + 1}</div>
-                <div class="lineup-name">${student}</div>
-            `;
-            container.appendChild(item);
+        const container = document.getElementById('lineupContainer'); 
+        if (container) container.innerHTML = '';
+        if (students.length === 0) return;
+        shuffle(students).forEach((s, i) => {
+            const item = document.createElement('div'); item.className = 'lineup-item';
+            item.innerHTML = `<div class="lineup-number">${i + 1}</div><div class="lineup-name">${s}</div>`;
+            if (container) container.appendChild(item);
         });
     }
 
+    // --- GEMINI AI FEATURES ---
+    async function callGemini(prompt) {
+        if (!apiKey) { customAlert("API Key missing."); return null; }
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+            const result = await res.json();
+            return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+        } catch (error) { console.error(error); return "AI service unavailable."; }
+    }
+
+    async function smartCleanRoster() {
+        const txt = document.getElementById('rosterInput')?.value;
+        if (!txt) return customAlert("Paste text first.");
+        
+        const btn = document.getElementById('smartFormatBtn'); 
+        const orig = btn ? btn.innerHTML : 'Thinking...'; 
+        if (btn) btn.innerHTML = 'Thinking...';
+        
+        const res = await callGemini(`Extract ONLY names. Format one per line:\n"${txt}"`);
+        if (res) { 
+            const rosterInput = document.getElementById('rosterInput');
+            if (rosterInput) rosterInput.value = res.trim(); 
+            applyRoster(); // Auto apply the cleaned list
+        }
+        if (btn) btn.innerHTML = orig;
+    }
+
+    function showModal(title, content) {
+        document.getElementById('modalTitle').innerText = title; 
+        document.getElementById('modalBody').innerText = content; 
+        document.getElementById('aiModal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('aiModal').style.display = 'none'; }
 </script>
 </body>
 </html>
